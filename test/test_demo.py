@@ -10,3 +10,5 @@ def test_generate_random_hand():
     joints = hand_info['joints']
     assert verts.shape == (batch_size, 778, 3)
     assert joints.shape == (batch_size, 21, 3)
+if __name__ == '__main__':
+	test_generate_random_hand()

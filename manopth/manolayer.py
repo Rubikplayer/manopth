@@ -25,7 +25,8 @@ class ManoLayer(Module):
                  use_pca=True,
                  root_rot_mode='axisang',
                  joint_rot_mode='axisang',
-                 robust_rot=False):
+                 robust_rot=False,
+                 unit='meters'):
         """
         Args:
             center_idx: index of center joint in our computations,
@@ -105,6 +106,15 @@ class ManoLayer(Module):
         self.kintree_table = smpl_data['kintree_table']
         parents = list(self.kintree_table[0].tolist())
         self.kintree_parents = parents
+
+        # Unit conversion
+        self.unit = unit
+        if self.unit in ['meters']:
+            self.unit_cvt = 1.0 # default
+        elif self.unit in ['mm']:
+            self.unit_cvt = 1000.
+        else:
+            raise RuntimeError(f'invalid unit = {unit}')
 
     def forward(self,
                 th_pose_coeffs,
@@ -268,6 +278,6 @@ class ManoLayer(Module):
             th_verts = th_verts + th_trans.unsqueeze(1)
 
         # Scale to milimeters
-        th_verts = th_verts * 1000
-        th_jtr = th_jtr * 1000
+        th_verts = th_verts * self.unit_cvt
+        th_jtr = th_jtr * self.unit_cvt
         return th_verts, th_jtr
